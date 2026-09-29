@@ -1,0 +1,106 @@
+### ============================================================
+###  solicitudes-avanzadas.http
+###  Taller 7 — Pruebas de la API del Hotel
+###  Ejecutar con el plugin "REST Client" de VS Code
+###  o con IntelliJ HTTP Client
+### ============================================================
+
+@baseUrl = http://localhost:8080
+
+
+### ============================================================
+### PRUEBA 1 — Creación de Suite Presidencial
+### POST /api/habitaciones/suites
+### Respuesta esperada: 201 Created con el ID generado
+### ============================================================
+
+POST {{baseUrl}}/api/habitaciones/suites
+Content-Type: application/json
+
+{
+  "numero": "P05-501",
+  "precioPorNoche": 350.0,
+  "capacidadMaxima": 2,
+  "jacuzziPrivado": true,
+  "incluyeMayordomo": true
+}
+
+
+### ============================================================
+### PRUEBA 1b — (Opcional) Creación de Habitación Estándar
+### POST /api/habitaciones/estandar
+### Respuesta esperada: 201 Created con el ID generado
+### ============================================================
+
+POST {{baseUrl}}/api/habitaciones/estandar
+Content-Type: application/json
+
+{
+  "numero": "STD-101",
+  "precioPorNoche": 120.0,
+  "capacidadMaxima": 2,
+  "camasIndividuales": 2
+}
+
+
+### ============================================================
+### PRUEBA 2 — Consulta Polimórfica de Habitaciones
+### GET /api/habitaciones
+### Respuesta esperada: array JSON donde conviven habitaciones
+### estándar y suites, cada una con "tipo": "ESTANDAR" o "SUITE"
+### y sus campos propios sin errores de casteo
+### ============================================================
+
+GET {{baseUrl}}/api/habitaciones
+
+
+### ============================================================
+### PRUEBA 3 — Resumen Ejecutivo del Cliente
+###
+### PASO PREVIO: crear un cliente primero
+### POST /api/clientes
+### ============================================================
+
+POST {{baseUrl}}/api/clientes
+Content-Type: application/json
+
+{
+  "nombre": "María García",
+  "email": "maria.garcia@hotel.com"
+}
+
+
+### ============================================================
+### PRUEBA 3 — GET /api/clientes/{id}/resumen
+### Reemplazar {clienteId} con el UUID devuelto en el paso previo
+### Respuesta esperada: totalReservasRealizadas, montoTotalGastado
+### calculados y lista reservasRecientes sin referencia circular
+### ============================================================
+
+@clienteId = be014d64-9e13-40b8-9cd9-b292a239f3b0
+
+GET {{baseUrl}}/api/clientes/{{clienteId}}/resumen
+
+
+### ============================================================
+### PRUEBA 4 — Actualización Selectiva (PATCH)
+### PATCH /api/clientes/{id}
+### Solo se envía "nombre" — email, activo y penalizaciones
+### deben permanecer inalterados en la base de datos
+### Respuesta esperada: 200 OK con ClienteResponse actualizado
+### ============================================================
+
+PATCH {{baseUrl}}/api/clientes/{{clienteId}}
+Content-Type: application/json
+
+{
+  "nombre": "Nuevo Nombre Modificado"
+}
+
+
+### ============================================================
+### VERIFICACIÓN PATCH — confirmar que email no cambió
+### GET /api/clientes/{id}
+### ============================================================
+
+GET {{baseUrl}}/api/clientes/{{clienteId}}

@@ -1,10 +1,16 @@
 package com.hotel.Hotel.domain;
 
-import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "clientes")
@@ -84,5 +90,18 @@ public class Cliente {
 
     public List<Reserva> getReservas() {
         return Collections.unmodifiableList(reservas);
+    }
+
+    // Setters selectivos — expuestos únicamente para el PATCH parcial
+    public void setNombre(String nombre) {
+        if (nombre == null || nombre.isBlank())
+            throw new IllegalArgumentException("El nombre no puede estar vacío");
+        this.nombre = nombre;
+    }
+
+    public void setEmail(String email) {
+        if (email == null || email.isBlank())
+            throw new IllegalArgumentException("El email no puede estar vacío");
+        this.email = email;
     }
 }

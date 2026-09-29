@@ -1,15 +1,18 @@
 package com.hotel.Hotel.service;
 
-import com.hotel.Hotel.domain.Cliente;
-import com.hotel.Hotel.dto.request.CrearClienteRequest;
-import com.hotel.Hotel.dto.response.ClienteResponse;
-import com.hotel.Hotel.mapper.ClienteMapper;
-import com.hotel.Hotel.repository.ClienteRepository;
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
+import com.hotel.Hotel.domain.Cliente;
+import com.hotel.Hotel.dto.request.ActualizarClienteRequest;
+import com.hotel.Hotel.dto.request.CrearClienteRequest;
+import com.hotel.Hotel.dto.response.ClienteResponse;
+import com.hotel.Hotel.dto.response.ClienteResumenResponse;
+import com.hotel.Hotel.mapper.ClienteMapper;
+import com.hotel.Hotel.repository.ClienteRepository;
 
 @Service
 public class ClienteService {
@@ -39,5 +42,26 @@ public class ClienteService {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con ID: " + id));
         return clienteMapper.toResponse(cliente);
+    }
+
+    @Transactional(readOnly = true)
+    public ClienteResumenResponse obtenerResumen(UUID id) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con ID: " + id));
+        return clienteMapper.toResumenResponse(cliente);
+    }
+
+    /**
+     * Tarea 3: actualización parcial (PATCH).
+     * Carga la entidad, aplica solo los campos no-null del DTO
+     * via el mapper con NullValuePropertyMappingStrategy.IGNORE,
+     * y persiste los cambios.
+     */
+    @Transactional
+    public ClienteResponse actualizar(UUID id, ActualizarClienteRequest request) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado con ID: " + id));
+        clienteMapper.updateClienteFromDto(request, cliente);
+        return clienteMapper.toResponse(clienteRepository.save(cliente));
     }
 }
